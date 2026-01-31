@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Sentinel - Security Management</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">🛡️</div>
+                <h1>Campus<span>Sentinel</span></h1>
+            </div>
+            <nav>
+                <ul>
+                    <li class="active" onclick="switchSection('dashboard')">
+                        <span class="icon">📊</span> Admin Dashboard
+                    </li>
+                    <li onclick="switchSection('registration')">
+                        <span class="icon">📝</span> Student Registration
+                    </li>
+                    <li onclick="switchSection('verification')">
+                        <span class="icon">🔍</span> Student Verification
+                    </li>
+                    <li onclick="switchSection('threat')">
+                        <span class="icon">⚠️</span> Threat Analysis
+                    </li>
+                    <li onclick="switchSection('alerts')">
+                        <span class="icon">🔔</span> Alert Management
+                    </li>
+                    <li onclick="switchSection('database')">
+                        <span class="icon">📁</span> Student Database
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <p>System v1.0</p>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="active">
+                <header>
+                    <h2>Admin Dashboard</h2>
+                    <p>Overview of campus security status.</p>
+                </header>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3>Total Students</h3>
+                            <p id="total-students">0</p>
+                        </div>
+                        <div class="stat-icon blue">👥</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3>Total Incidents</h3>
+                            <p id="total-incidents">0</p>
+                        </div>
+                        <div class="stat-icon red">🚨</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3>Pending Threats</h3>
+                            <p id="total-threats">0</p>
+                        </div>
+                        <div class="stat-icon orange">🔥</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3>Resolved</h3>
+                            <p id="resolved-incidents">0</p>
+                        </div>
+                        <div class="stat-icon green">✅</div>
+                    </div>
+                </div>
+                <div class="charts-container">
+                    <div class="chart-box">
+                        <h3>Security Incident Trends</h3>
+                        <canvas id="incidentChart"></canvas>
+                    </div>
+                    <div class="alert-box">
+                        <h3>Urgent Notifications</h3>
+                        <ul id="notifications-list">
+                            <li>No new notifications</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Registration Section -->
+            <section id="registration">
+                <header>
+                    <h2>Student Registration</h2>
+                    <p>Enroll new students via ID card OCR and face capture.</p>
+                </header>
+                <div class="card registration-card">
+                    <div class="reg-steps">
+                        <div class="reg-step active" id="step1-head">1. Upload ID</div>
+                        <div class="reg-step" id="step2-head">2. Face Capture</div>
+                        <div class="reg-step" id="step3-head">3. Complete</div>
+                    </div>
+                    
+                    <!-- Step 1: ID Upload -->
+                    <div id="reg-step1" class="step-content active">
+                        <div class="upload-area" id="id-upload-area">
+                            <input type="file" id="id-card-input" hidden>
+                            <label for="id-card-input">
+                                <div class="upload-icon">📄</div>
+                                <p>Click to upload Student ID Card</p>
+                            </label>
+                        </div>
+                        <div class="action-bar">
+                            <button class="btn btn-primary" onclick="processID()">Process ID</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Face Capture -->
+                    <div id="reg-step2" class="step-content">
+                        <div class="camera-container">
+                            <video id="reg-video" autoplay></video>
+                            <div class="face-guide"></div>
+                        </div>
+                        <div class="captured-preview hidden" id="reg-face-preview">
+                            <img src="" id="reg-face-img">
+                        </div>
+                        <div class="action-bar">
+                            <button class="btn btn-secondary" onclick="startRegCamera()">Start Camera</button>
+                            <button class="btn btn-primary" onclick="captureRegFace()">Capture Face</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Confirmation -->
+                    <div id="reg-step3" class="step-content">
+                        <div class="confirm-details">
+                            <div class="detail-row"><span>Name:</span> <input type="text" id="reg-name"></div>
+                            <div class="detail-row"><span>Roll No:</span> <input type="text" id="reg-roll"></div>
+                            <div class="detail-row"><span>Department:</span> <input type="text" id="reg-dept"></div>
+                        </div>
+                        <div id="qr-result" class="qr-result hidden">
+                            <p>Registration Complete!</p>
+                            <img src="" id="qr-img">
+                        </div>
+                        <div class="action-bar">
+                            <button class="btn btn-success" onclick="completeRegistration()">Enroll Student</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Verification Section -->
+            <section id="verification">
+                <header>
+                    <h2>Student Verification</h2>
+                    <p>Verify identity using QR code and live face matching.</p>
+                </header>
+                <div class="verify-container">
+                    <div class="verify-main">
+                        <div class="camera-wrapper">
+                            <video id="verify-video" autoplay></video>
+                            <div class="scan-overlay"></div>
+                        </div>
+                        <div class="status-indicator" id="verify-status">
+                            WAITING FOR QR...
+                        </div>
+                    </div>
+                    <div class="verify-info">
+                        <h3>Student Details</h3>
+                        <div id="student-info-display" class="info-card empty">
+                            <p>Scan QR to begin</p>
+                        </div>
+                        <div class="verify-actions">
+                            <button class="btn btn-primary" onclick="startVerification()">Scan & Verify</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Threat Analysis Section -->
+            <section id="threat">
+                <header>
+                    <h2>Threat Analysis</h2>
+                    <p>Analyze incidents using AI vision models.</p>
+                </header>
+                <div class="threat-grid">
+                    <div class="threat-upload card">
+                        <h3>Incident Input</h3>
+                        <div class="input-tabs">
+                            <button class="tab-btn active" onclick="switchThreatInput('upload')">Upload File</button>
+                            <button class="tab-btn" onclick="switchThreatInput('camera')">Camera</button>
+                        </div>
+                        <div id="threat-upload-area" class="threat-input-sec active">
+                            <input type="file" id="threat-file" class="file-input">
+                        </div>
+                        <div id="threat-camera-area" class="threat-input-sec">
+                            <video id="threat-video" autoplay></video>
+                            <button class="btn btn-sm btn-secondary" onclick="captureThreat()">Capture</button>
+                        </div>
+                        <div class="form-group">
+                            <label>Location</label>
+                            <input type="text" id="threat-location" placeholder="e.g. Near Library">
+                        </div>
+                        <button class="btn btn-danger btn-block" onclick="runThreatAnalysis()">Analyze Threat</button>
+                    </div>
+                    <div class="threat-result card">
+                        <h3>Analysis Results</h3>
+                        <div id="threat-output" class="result-placeholder">
+                            Waiting for analysis...
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Alert Management Section -->
+            <section id="alerts">
+                <header>
+                    <h2>Alert Management</h2>
+                    <p>Review and resolve security alerts.</p>
+                </header>
+                <div class="table-card">
+                    <table id="incidents-table">
+                        <thead>
+                            <tr>
+                                <th>Incident ID</th>
+                                <th>Time</th>
+                                <th>Location</th>
+                                <th>Level</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Student Database Section -->
+            <section id="database">
+                <header>
+                    <h2>Student Database</h2>
+                    <p>Lookup registered student information.</p>
+                </header>
+                <div class="table-card">
+                    <div class="search-bar">
+                        <input type="text" id="student-search" placeholder="Search by name or roll no...">
+                    </div>
+                    <table id="students-table">
+                        <thead>
+                            <tr>
+                                <th>Roll No</th>
+                                <th>Name</th>
+                                <th>Department</th>
+                                <th>Date Enrolled</th>
+                                <th>Links</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals / UI Helpers -->
+    <div id="loading" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <p>Processing...</p>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
